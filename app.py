@@ -8,7 +8,9 @@ from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import learning_curve
 
 # Set Up Streamlit App 
-st.set_page_config(layout="wide", theme="dark")
+st.set_page_config(page_title="Raining Prediction in Australia",
+                   page_icon="🌤️",
+                   layout="wide")
 
 # Charger le modèle et les transformateurs
 aussie_rain = joblib.load('aussie_rain.joblib')
@@ -33,9 +35,6 @@ def predict_input(single_input):
     pred = model.predict(X_input)[0]
     prob = model.predict_proba(X_input)[0][list(model.classes_).index(pred)]
     return pred, prob
-
-# Interface utilisateur Streamlit
-st.title("What's the weather in Australia tomorrow?")
 
 # Chargement des données d'entraînement pour la visualisation
 train_df = pd.read_parquet('train_inputs.parquet')
