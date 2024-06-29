@@ -4,15 +4,8 @@ import numpy as np
 import joblib
 import plotly.express as px
 import plotly.graph_objects as go
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import learning_curve
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy.stats import gaussian_kde
-from datetime import date, timedelta
 
 # Charger le modèle et les transformateurs
 aussie_rain = joblib.load('aussie_rain.joblib')
