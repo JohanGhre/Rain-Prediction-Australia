@@ -7,6 +7,9 @@ import plotly.graph_objects as go
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import learning_curve
 
+# Set Up Streamlit App 
+st.set_page_config(layout="wide", theme="dark")
+
 # Charger le modèle et les transformateurs
 aussie_rain = joblib.load('aussie_rain.joblib')
 
