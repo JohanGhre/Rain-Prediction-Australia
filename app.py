@@ -12,9 +12,6 @@ st.set_page_config(page_title="Raining Prediction in Australia",
                    page_icon="🌤️",
                    layout="wide")
 
-# Affichage du titre dans l'interface utilisateur
-st.title("Raining Prediction in Australia")
-
 # Charger le modèle et les transformateurs
 aussie_rain = joblib.load('aussie_rain.joblib')
 
@@ -42,6 +39,9 @@ def predict_input(single_input):
 # Chargement des données d'entraînement pour la visualisation
 train_df = pd.read_parquet('train_inputs.parquet')
 train_df[target_col] = pd.read_parquet('train_targets.parquet')[target_col]
+
+# Affichage du titre dans l'interface utilisateur
+st.title("Raining Prediction in Australia")
 
 # Mise en page à deux colonnes avec ajustement de la largeur
 col1, col2 = st.columns([2, 1])
