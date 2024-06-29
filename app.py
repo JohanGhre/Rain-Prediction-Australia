@@ -41,7 +41,7 @@ train_df = pd.read_parquet('train_inputs.parquet')
 train_df[target_col] = pd.read_parquet('train_targets.parquet')[target_col]
 
 # Affichage du titre dans l'interface utilisateur
-st.title("Raining Prediction in Australia")
+st.title("Raining Prediction in Australia 🌧️🇦🇺")
 
 # Mise en page à deux colonnes avec ajustement de la largeur
 col1, col2 = st.columns([2, 1])
