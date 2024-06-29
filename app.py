@@ -126,9 +126,43 @@ with col2:
 
     <img src="https://i.imgur.com/sAVwvZP.png" style="width: 300px;">
 
-    To train a logistic regression model, we can use the `LogisticRegression` class from Scikit-learn.
+    To train a logistic regression model, we can use the LogisticRegression class from Scikit-learn.
     </div>
     """, unsafe_allow_html=True)
+    
+    
+    st.markdown("""
+    ### Exemple de données d'entrée :
+    
+    ```python
+    new_input = {
+        'Date': '2021-06-19',
+        'Location': 'Katherine',
+        'MinTemp': 23.2,
+        'MaxTemp': 33.2,
+        'Rainfall': 10.2,
+        'Evaporation': 4.2,
+        'Sunshine': np.nan,
+        'WindGustDir': 'NNW',
+        'WindGustSpeed': 52.0,
+        'WindDir9am': 'NW',
+        'WindDir3pm': 'NNE',
+        'WindSpeed9am': 13.0,
+        'WindSpeed3pm': 20.0,
+        'Humidity9am': 89.0,
+        'Humidity3pm': 58.0,
+        'Pressure9am': 1004.8,
+        'Pressure3pm': 1001.5,
+        'Cloud9am': 8.0,
+        'Cloud3pm': 5.0,
+        'Temp9am': 25.7,
+        'Temp3pm': 33.0,
+        'RainToday': 'Yes'
+    }
+    ```
+    
+    Vous pouvez utiliser ces valeurs comme exemple pour tester les prédictions.
+    """)
     
     st.header("Raining Prediction")
     
@@ -144,6 +178,7 @@ with col2:
                 input_data[col] = st.text_input(col, value='')
     
     if st.button("Predict"):
+    
         pred, prob = predict_input(input_data)
         st.write(f"La prédiction est : **{'Oui' if pred == 'Yes' else 'Non'}** avec une probabilité de {prob:.2f}")
 
@@ -165,20 +200,43 @@ with col2:
         st.write(report_df)
 
         # Affichage de la courbe d'apprentissage
-        st.header("Learning Curve")
-        train_sizes, train_scores, test_scores = learning_curve(
-            model, train_df[numeric_cols + encoded_cols], train_df[target_col], cv=5, scoring='accuracy', n_jobs=-1,
-            train_sizes=np.linspace(0.1, 1.0, 5)
-        )
-        train_mean = np.mean(train_scores, axis=1)
-        test_mean = np.mean(test_scores, axis=1)
+        #st.header("Learning Curve")
+        #train_sizes, train_scores, test_scores = learning_curve(
+            #model, train_df[numeric_cols + encoded_cols], train_df[target_col], cv=5, scoring='accuracy', n_jobs=-1,
+            #train_sizes=np.linspace(0.1, 1.0, 5)
+        #)
+        #train_mean = np.mean(train_scores, axis=1)
+        #test_mean = np.mean(test_scores, axis=1)
 
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=train_sizes, y=train_mean, mode='lines+markers', name='Train'))
-        fig.add_trace(go.Scatter(x=train_sizes, y=test_mean, mode='lines+markers', name='Test'))
-        fig.update_layout(title='Courbe d\'Apprentissage', xaxis_title='Taille de l\'échantillon', yaxis_title='Score',
-                          width=600, height=600, plot_bgcolor='rgba(0,0,0,0)')
+        #fig = go.Figure()
+        #fig.add_trace(go.Scatter(x=train_sizes, y=train_mean, mode='lines+markers', name='Train'))
+        #fig.add_trace(go.Scatter(x=train_sizes, y=test_mean, mode='lines+markers', name='Test'))
+        #fig.update_layout(title='Courbe d\'Apprentissage', xaxis_title='Taille de l\'échantillon', yaxis_title='Score',
+                          #width=600, height=600, plot_bgcolor='rgba(0,0,0,0)')
+        #st.plotly_chart(fig)
+        
+    
+        # Calculer les scores de probabilité pour les données d'entraînement
+        from sklearn.metrics import roc_curve
+
+        # Convert 'Yes' and 'No' to 1 and 0 respectively
+        y_true_binary = y_true.replace({'No': 0, 'Yes': 1})
+
+        y_proba = model.predict_proba(train_df[numeric_cols + encoded_cols])[:, 1]
+
+        # Compute ROC curve
+        fpr, tpr, thresholds = roc_curve(y_true_binary, y_proba)
+
+        # Plot ROC curve
+        fig = px.area(x=fpr, y=tpr, title='Courbe ROC',
+                    labels=dict(x='Taux de Faux Positifs', y='Taux de Vrais Positifs'),
+                    width=600, height=600)
+        fig.add_shape(type='line', line=dict(dash='dash'), x0=0, x1=1, y0=0, y1=1)
+        fig.update_yaxes(scaleanchor="x", scaleratio=1)
+        fig.update_xaxes(constrain='domain')
         st.plotly_chart(fig)
+
+
 
 # Feature Importance
 st.header("Feature Importance")
