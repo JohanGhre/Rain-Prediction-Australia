@@ -12,6 +12,9 @@ st.set_page_config(page_title="Raining Prediction in Australia",
                    page_icon="🌤️",
                    layout="wide")
 
+# Affichage du titre dans l'interface utilisateur
+st.title("Raining Prediction in Australia")
+
 # Charger le modèle et les transformateurs
 aussie_rain = joblib.load('aussie_rain.joblib')
 
