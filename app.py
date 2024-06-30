@@ -4,8 +4,8 @@ import numpy as np
 import joblib
 import plotly.express as px
 import plotly.graph_objects as go
-from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.model_selection import learning_curve
+from sklearn.metrics import confusion_matrix, classification_report, roc_curve
+from datetime import datetime
 
 # Set Up Streamlit App 
 st.set_page_config(page_title="Raining Prediction in Australia",
@@ -41,7 +41,7 @@ train_df = pd.read_parquet('train_inputs.parquet')
 train_df[target_col] = pd.read_parquet('train_targets.parquet')[target_col]
 
 # Affichage du titre dans l'interface utilisateur
-st.title("Raining Prediction in Australia 🌧️🇦🇺")
+st.title("Rainfall Prediction Australie 🌧️🇦🇺")
 
 # Mise en page à deux colonnes avec ajustement de la largeur
 col1, col2 = st.columns([2, 1])
@@ -168,7 +168,13 @@ with col2:
     
     with st.expander("Saisir les caractéristiques"):
         input_data = {}
+        
+        # Ajouter le sélecteur de date
+        input_data['Date'] = st.date_input('Date', value=datetime.today()).strftime('%Y-%m-%d')
+        
         for col in input_cols:
+            if col == 'Date':
+                continue
             if col in numeric_cols:
                 input_data[col] = st.number_input(col, value=0.0)
             elif col in categorical_cols:
@@ -198,30 +204,9 @@ with col2:
         report = classification_report(y_true, y_pred, output_dict=True)
         report_df = pd.DataFrame(report).transpose()
         st.write(report_df)
-
-        # Affichage de la courbe d'apprentissage
-        #st.header("Learning Curve")
-        #train_sizes, train_scores, test_scores = learning_curve(
-            #model, train_df[numeric_cols + encoded_cols], train_df[target_col], cv=5, scoring='accuracy', n_jobs=-1,
-            #train_sizes=np.linspace(0.1, 1.0, 5)
-        #)
-        #train_mean = np.mean(train_scores, axis=1)
-        #test_mean = np.mean(test_scores, axis=1)
-
-        #fig = go.Figure()
-        #fig.add_trace(go.Scatter(x=train_sizes, y=train_mean, mode='lines+markers', name='Train'))
-        #fig.add_trace(go.Scatter(x=train_sizes, y=test_mean, mode='lines+markers', name='Test'))
-        #fig.update_layout(title='Courbe d\'Apprentissage', xaxis_title='Taille de l\'échantillon', yaxis_title='Score',
-                          #width=600, height=600, plot_bgcolor='rgba(0,0,0,0)')
-        #st.plotly_chart(fig)
         
-    
         # Calculer les scores de probabilité pour les données d'entraînement
-        from sklearn.metrics import roc_curve
-
-        # Convert 'Yes' and 'No' to 1 and 0 respectively
         y_true_binary = y_true.replace({'No': 0, 'Yes': 1})
-
         y_proba = model.predict_proba(train_df[numeric_cols + encoded_cols])[:, 1]
 
         # Compute ROC curve
@@ -236,14 +221,12 @@ with col2:
         fig.update_xaxes(constrain='domain')
         st.plotly_chart(fig)
 
-
-
-# Feature Importance
-st.header("Feature Importance")
-feature_importance = model.coef_[0]
-feature_df = pd.DataFrame({
-    'Feature': numeric_cols + encoded_cols,
-    'Importance': feature_importance
-}).sort_values(by='Importance', ascending=False)
-fig = px.bar(feature_df, x='Importance', y='Feature', orientation='h', title='Importance des Caractéristiques')
-st.plotly_chart(fig)
+        # Feature Importance
+        st.header("Feature Importance")
+        feature_importance = model.coef_[0]
+        feature_df = pd.DataFrame({
+            'Feature': numeric_cols + encoded_cols,
+            'Importance': feature_importance
+        }).sort_values(by='Importance', ascending=False)
+        fig = px.bar(feature_df, x='Importance', y='Feature', orientation='h', title='Importance des Caractéristiques')
+        st.plotly_chart(fig)
